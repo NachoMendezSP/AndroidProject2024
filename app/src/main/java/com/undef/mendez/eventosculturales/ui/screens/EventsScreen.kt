@@ -1,11 +1,11 @@
-package com.undef.mendez.eventosculturales
+package com.undef.mendez.eventosculturales.ui.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,29 +15,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
-
-data class Event(
-    val name: String,
-    val date: String,
-    val location: String
-)
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.undef.mendez.eventosculturales.viewmodel.*
 
 @Composable
 fun EventsScreen(
-    events: List<Event>,
-    favoriteEvents: List<Event>,
-    onFavoriteToggle: (Event) -> Unit,
-    onEventClick: (Event) -> Unit // Nueva función para manejar el clic en un evento
+    viewModel: EventsViewModel = viewModel(),
+    onEventClick: (Event) -> Unit
 ) {
-    var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
-
-    // Filtrar eventos basándose en el texto de búsqueda
-    val filteredEvents = events.filter { event ->
-        event.name.contains(searchQuery.text, ignoreCase = true) ||
-                event.location.contains(searchQuery.text, ignoreCase = true)
-    }
+    // Obtener los datos necesarios desde el ViewModel
+    val events = viewModel.filteredEvents
+    val favoriteEvents = viewModel.favoriteEvents
+    val searchQuery = viewModel.searchQuery
 
     Column(
         modifier = Modifier
@@ -47,7 +37,7 @@ fun EventsScreen(
         // Barra de búsqueda
         OutlinedTextField(
             value = searchQuery,
-            onValueChange = { searchQuery = it },
+            onValueChange = { viewModel.updateSearchQuery(it) },
             label = { Text("Buscar eventos") },
             leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = "Buscar") },
             modifier = Modifier
@@ -59,11 +49,11 @@ fun EventsScreen(
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(filteredEvents) { event ->
+            items(events) { event ->
                 EventCard(
                     event = event,
                     isFavorite = favoriteEvents.contains(event),
-                    onFavoriteToggle = onFavoriteToggle,
+                    onFavoriteToggle = { viewModel.toggleFavorite(event) },
                     onClick = { onEventClick(event) } // Al hacer clic en el evento
                 )
             }
@@ -131,5 +121,5 @@ fun EventsScreenPreview() {
         Event("Exposición de Arte", "1 Dic 2023", "Museo de Arte Moderno"),
         Event("Obra de Teatro", "15 Dic 2023", "Auditorio Central")
     )
-    EventsScreen(events = sampleEvents, favoriteEvents = listOf(), onFavoriteToggle = {}, onEventClick = {})
+    EventsScreen(viewModel = EventsViewModel(), onEventClick = {})
 }

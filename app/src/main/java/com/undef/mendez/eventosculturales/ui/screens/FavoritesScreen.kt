@@ -1,4 +1,4 @@
-package com.undef.mendez.eventosculturales
+package com.undef.mendez.eventosculturales.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,13 +9,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.undef.mendez.eventosculturales.viewmodel.*
 
 @Composable
 fun FavoritesScreen(
-    favoriteEvents: List<Event>,
-    onFavoriteToggle: (Event) -> Unit,
+    viewModel: EventsViewModel = viewModel(),
     onEventClick: (Event) -> Unit
 ) {
+    val favoriteEvents = viewModel.favoriteEvents
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -35,7 +38,7 @@ fun FavoritesScreen(
                 EventCard(
                     event = event,
                     isFavorite = true,
-                    onFavoriteToggle = onFavoriteToggle,
+                    onFavoriteToggle = { viewModel.toggleFavorite(event) },
                     onClick = { onEventClick(event) }
                 )
             }

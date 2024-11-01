@@ -1,20 +1,33 @@
-package com.undef.mendez.eventosculturales
+package com.undef.mendez.eventosculturales.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.undef.mendez.eventosculturales.viewmodel.AuthViewModel
 
 @Composable
-fun RegisterScreen(onRegisterComplete: () -> Unit, onBackToLogin: () -> Unit) {
+fun RegisterScreen(
+    onRegisterComplete: () -> Unit,
+    onBackToLogin: () -> Unit,
+    viewModel: AuthViewModel = viewModel()
+) {
     val username = remember { mutableStateOf("") }
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
+    val isAuthenticated by viewModel.isAuthenticated
+    val errorMessage by viewModel.errorMessage
+
+    // Navegación automática al detectar registro exitoso
+    LaunchedEffect(isAuthenticated) {
+        if (isAuthenticated) {
+            onRegisterComplete()
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -56,8 +69,18 @@ fun RegisterScreen(onRegisterComplete: () -> Unit, onBackToLogin: () -> Unit) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Mensaje de error
+            errorMessage?.let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
+
             Button(
-                onClick = onRegisterComplete,
+                onClick = { viewModel.register(email.value, password.value) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Registrarse")

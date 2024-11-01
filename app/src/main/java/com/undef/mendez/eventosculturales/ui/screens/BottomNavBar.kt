@@ -1,4 +1,4 @@
-package com.undef.mendez.eventosculturales
+package com.undef.mendez.eventosculturales.ui.screens
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -7,6 +7,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.undef.mendez.eventosculturales.ui.components.BottomNavItem
 
 @Composable
 fun BottomNavBar(navController: NavController) {

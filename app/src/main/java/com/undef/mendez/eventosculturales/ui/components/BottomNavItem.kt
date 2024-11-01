@@ -1,4 +1,4 @@
-package com.undef.mendez.eventosculturales
+package com.undef.mendez.eventosculturales.ui.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*

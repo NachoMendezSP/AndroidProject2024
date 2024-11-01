@@ -9,10 +9,20 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.undef.mendez.eventosculturales.ui.screens.AuthScreen
+import com.undef.mendez.eventosculturales.ui.screens.BottomNavBar
+import com.undef.mendez.eventosculturales.ui.screens.EventDetailScreen
+import com.undef.mendez.eventosculturales.ui.screens.EventsScreen
+import com.undef.mendez.eventosculturales.ui.screens.FavoritesScreen
+import com.undef.mendez.eventosculturales.ui.screens.ProfileScreen
+import com.undef.mendez.eventosculturales.ui.screens.RegisterScreen
+import com.undef.mendez.eventosculturales.ui.screens.SplashScreen
 import com.undef.mendez.eventosculturales.ui.theme.EventosCulturalesTheme
+import com.undef.mendez.eventosculturales.viewmodel.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,8 +38,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
+    val authViewModel: AuthViewModel = viewModel()
+    val eventsViewModel: EventsViewModel = viewModel()
     var showBottomBar by remember { mutableStateOf(false) }
-    val favoriteEvents = remember { mutableStateListOf<Event>() }
 
     LaunchedEffect(navController) {
         navController.currentBackStackEntryFlow.collect { backStackEntry ->
@@ -59,8 +70,9 @@ fun MainScreen() {
 
             composable("auth") {
                 AuthScreen(
-                    onLogin = { navController.navigate("events") },
-                    onRegister = { navController.navigate("register") }
+                    onLoginSuccess = { navController.navigate("events") },
+                    onRegister = { navController.navigate("register") },
+                    viewModel = authViewModel
                 )
             }
 
@@ -71,63 +83,55 @@ fun MainScreen() {
                     },
                     onBackToLogin = {
                         navController.popBackStack()  // Regresa a la pantalla de inicio de sesión si se toca "Volver"
-                    }
+                    },
+                    viewModel = authViewModel
                 )
             }
 
             composable("events") {
-                val sampleEvents = listOf(
-                    Event("Concierto de Jazz", "24 Nov 2023", "Teatro Principal"),
-                    Event("Exposición de Arte", "1 Dic 2023", "Museo de Arte Moderno"),
-                    Event("Obra de Teatro", "15 Dic 2023", "Auditorio Central")
-                )
                 EventsScreen(
-                    events = sampleEvents,
-                    favoriteEvents = favoriteEvents,
-                    onFavoriteToggle = { event ->
-                        if (favoriteEvents.contains(event)) {
-                            favoriteEvents.remove(event)
-                        } else {
-                            favoriteEvents.add(event)
-                        }
-                    },
+                    viewModel = eventsViewModel,
                     onEventClick = { event ->
-                        navController.navigate("eventDetail/${event.name}")
+                        eventsViewModel.selectEvent(event.name)
+                        navController.navigate("eventDetail")
                     }
                 )
             }
 
             composable("favorites") {
                 FavoritesScreen(
-                    favoriteEvents = favoriteEvents,
-                    onFavoriteToggle = { event ->
-                        if (favoriteEvents.contains(event)) {
-                            favoriteEvents.remove(event)
-                        } else {
-                            favoriteEvents.add(event)
-                        }
-                    },
+                    viewModel = eventsViewModel,
                     onEventClick = { event ->
-                        navController.navigate("eventDetail/${event.name}")
+                        eventsViewModel.selectEvent(event.name)
+                        navController.navigate("eventDetail")
                     }
                 )
             }
 
-            composable("eventDetail/{eventName}") { backStackEntry ->
-                val eventName = backStackEntry.arguments?.getString("eventName")
-                val event = favoriteEvents.find { it.name == eventName }
-                    ?: Event(eventName ?: "Evento Desconocido", "Fecha Desconocida", "Ubicación Desconocida")
-
-                EventDetailScreen(event)
+            composable("eventDetail") {
+                eventsViewModel.selectedEvent.value?.let { event ->
+                    EventDetailScreen(event)
+                }
             }
 
             composable("profile") {
+                val profileViewModel: ProfileViewModel = viewModel() // Instancia el ViewModel aquí
                 val context = LocalContext.current
 
-                ProfileScreen(onSaveChanges = {
-                    Toast.makeText(context, "Cambios guardados exitosamente", Toast.LENGTH_SHORT).show()
-                })
+                ProfileScreen(
+                    onSaveChanges = {
+                        Toast.makeText(context, "Cambios guardados exitosamente", Toast.LENGTH_SHORT).show()
+                    },
+                    onLogout = {
+                        navController.navigate("auth") {
+                            popUpTo("events") { inclusive = true }
+                        }
+                    },
+                    authViewModel = authViewModel,
+                    viewModel = profileViewModel
+                )
             }
+
         }
     }
 }
