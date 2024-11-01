@@ -72,7 +72,7 @@ fun EventCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { onClick() }, // Detecta clics para ir a la pantalla de detalle
+            .clickable { onClick() },
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Row(
@@ -116,10 +116,5 @@ fun EventCard(
 @Preview(showBackground = true)
 @Composable
 fun EventsScreenPreview() {
-    val sampleEvents = listOf(
-        Event("Concierto de Jazz", "24 Nov 2023", "Teatro Principal"),
-        Event("Exposición de Arte", "1 Dic 2023", "Museo de Arte Moderno"),
-        Event("Obra de Teatro", "15 Dic 2023", "Auditorio Central")
-    )
     EventsScreen(viewModel = EventsViewModel(), onEventClick = {})
 }

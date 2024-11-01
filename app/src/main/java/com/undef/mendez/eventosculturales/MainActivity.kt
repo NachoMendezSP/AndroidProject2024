@@ -115,7 +115,7 @@ fun MainScreen() {
             }
 
             composable("profile") {
-                val profileViewModel: ProfileViewModel = viewModel() // Instancia el ViewModel aquí
+                val profileViewModel: ProfileViewModel = viewModel()
                 val context = LocalContext.current
 
                 ProfileScreen(

@@ -29,7 +29,7 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
-                painter = painterResource(id = R.drawable.logo),  // Asegúrate de que "logo" esté en drawable
+                painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo de la aplicación",
                 modifier = Modifier.size(150.dp)
             )

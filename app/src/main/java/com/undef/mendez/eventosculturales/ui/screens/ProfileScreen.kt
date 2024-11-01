@@ -100,7 +100,7 @@ fun ProfileScreen(
             // Configuración de tiempo de notificación
             Box(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "Notificarme ${notificationDaysBefore.value} días antes",
+                    text = "Notificarme ${notificationDaysBefore.intValue} días antes",
                     modifier = Modifier
                         .clickable { expanded = true }
                         .padding(vertical = 8.dp)
@@ -116,7 +116,7 @@ fun ProfileScreen(
                         DropdownMenuItem(
                             text = { Text("$days días antes") },
                             onClick = {
-                                viewModel.notificationDaysBefore.value = days
+                                viewModel.notificationDaysBefore.intValue = days
                                 expanded = false
                             }
                         )
